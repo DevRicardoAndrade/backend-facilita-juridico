@@ -93,7 +93,6 @@ export default class ClientRepository implements IClientRepository {
   async getRoutesOptimized() {
     const clients: Client[] | null = await this.find(null);
     if (clients) {
-      console.log(clients);
       clients.sort((a, b) => {
         const distanceA = this.calculeDistance(
           { x: 0, y: 0 },
