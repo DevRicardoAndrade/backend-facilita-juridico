@@ -6,3 +6,5 @@ CREATE TABLE clients(
     email varchar(125),
     telephone varchar(20)
 );
+ALTER TABLE clients ADD cordX numeric;
+ALTER TABLE clients ADD cordY numeric;
