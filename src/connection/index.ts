@@ -17,7 +17,7 @@ const conn = {
   end: () => {
     client.end();
   },
-  querry: async (sqlText: string, parameters?: []) => {
+  querry: async (sqlText: string, parameters?: any[]) => {
     return await client.query(sqlText, parameters);
   },
 };
