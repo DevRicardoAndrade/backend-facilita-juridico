@@ -7,5 +7,5 @@ services:
     ports:
       - 5432:5432
     environment:
-      POSTGRES_PASSWORD: facilita
-      POSTGRES_DB: 123456
+      POSTGRES_USER: facilita
+      POSTGRES_PASSWORD: facilitapassword

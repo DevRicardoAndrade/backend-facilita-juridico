@@ -1,24 +1,37 @@
 import { Client } from "pg";
 import IConfig from "./IConfig";
+import { config as dotenvLoad } from "dotenv";
+
+dotenvLoad();
 
 const config: IConfig = {
-  user: process.env.USER,
-  password: process.env.PASSWORD,
-  host: process.env.HOST,
-  database: process.env.DATABASE,
-  port: Number(process.env.DBPORT),
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  host: process.env.DB_HOST,
+  database: "postgres",
+  port: Number(process.env.DB_PORT),
 };
-
 const client = new Client(config);
 
 const conn = {
-  connect: () => {
-    client.connect();
+  connect: async () => {
+    try {
+      await client.connect();
+      console.log("Connected to PostgreSQL");
+    } catch (error) {
+      console.error(error);
+    }
   },
-  end: () => {
-    client.end();
+  end: async () => {
+    try {
+      await client.end();
+      console.log("Disconnected to PostgreSQL");
+    } catch (error) {
+      console.error(error);
+    }
   },
-  querry: async (sqlText: string, parameters?: any[]) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  query: async (sqlText: string, parameters?: any[]) => {
     return await client.query(sqlText, parameters);
   },
 };
