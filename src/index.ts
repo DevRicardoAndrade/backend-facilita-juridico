@@ -8,8 +8,8 @@ config();
 const PORT = process.env.PORT || 3030;
 
 const app = express();
-app.use(clientRoutes);
 app.use(express.json());
+app.use(clientRoutes);
 
 conn.connect();
 
