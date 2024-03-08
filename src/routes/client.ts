@@ -5,10 +5,8 @@ import express from "express";
 const router = express.Router();
 const clientController = injectClient();
 
-router.get("/clients/:id", async (req, res) => {
-  const { statusCode, data } = await clientController.get(
-    Number(req.params.id)
-  );
+router.get("/clients", async (req, res) => {
+  const { statusCode, data } = await clientController.get(req.query);
   res.status(statusCode).send(data);
 });
 router.post("/clients", async (req, res) => {

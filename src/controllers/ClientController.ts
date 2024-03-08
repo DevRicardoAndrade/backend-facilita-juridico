@@ -25,13 +25,14 @@ export class ClientController {
       };
     }
   }
-  async get(id: number): Promise<IResult> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async get(params: Record<string, any>): Promise<IResult> {
     try {
-      const client = await this.#_clienteRepository.find(id);
-      if (client)
+      const clients = await this.#_clienteRepository.find(params);
+      if (clients)
         return {
           statusCode: 200,
-          data: client,
+          data: clients,
         };
       return {
         statusCode: 404,

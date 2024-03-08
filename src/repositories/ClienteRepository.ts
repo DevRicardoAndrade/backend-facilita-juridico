@@ -3,20 +3,46 @@ import conn from "../connection";
 import Client from "../entities/Client";
 
 export default class ClientRepository implements IClientRepository {
-  async find(id: number): Promise<void | Client> {
-    const sqlText =
-      "SELECT id, name, email, telephone FROM clients WHERE id = $1";
-    const result = await conn.query(sqlText, [id]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async find(params: Record<string, any>): Promise<void | Client[]> {
+    const values = [];
+    const email = params["email"];
+    const name = params["name"];
+    const telephone = params["telephone"];
+
+    const sqlText = "SELECT id, name, email, telephone FROM clients ";
+    let whereString = "";
+
+    if (email) {
+      whereString += " WHERE email = $1";
+      values.push(email);
+    }
+    if (name) {
+      if (!email) {
+        whereString += " WHERE";
+      } else {
+        whereString += " AND";
+      }
+      whereString += ` name LIKE $${values.length + 1}`;
+      values.push(`%${name}%`);
+    }
+    if (telephone) {
+      if (!email && !name) {
+        whereString += " WHERE";
+      } else {
+        whereString += " AND";
+      }
+      whereString += ` telephone = $${values.length + 1}`;
+      values.push(telephone);
+    }
+    const result = await conn.query(sqlText + whereString, values);
     if (result.rowCount) {
-      const row = result.rows[0];
-      const clientData = Client.parse(
-        row.id,
-        row.name,
-        row.email,
-        row.telephone
-      );
+      const clientData = result.rows.map((data) => {
+        return Client.parse(data.id, data.name, data.email, data.telephone);
+      });
       return clientData;
-    } else return;
+    }
+    return;
   }
   async findAll(): Promise<void | Client[]> {
     const sqlText = "SELECT id, name, email, telephone FROM clients";
