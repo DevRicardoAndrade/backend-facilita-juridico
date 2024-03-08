@@ -6,6 +6,7 @@ const config: IConfig = {
   password: process.env.PASSWORD,
   host: process.env.HOST,
   database: process.env.DATABASE,
+  port: Number(process.env.DBPORT),
 };
 
 const client = new Client(config);
