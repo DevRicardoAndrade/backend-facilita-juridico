@@ -6,6 +6,7 @@ export default class ClientRepository implements IClientRepository {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async find(params: Record<string, any>): Promise<void | Client[]> {
     const values = [];
+    const id = params["id"];
     const email = params["email"];
     const name = params["name"];
     const telephone = params["telephone"];
@@ -34,6 +35,15 @@ export default class ClientRepository implements IClientRepository {
       }
       whereString += ` telephone = $${values.length + 1}`;
       values.push(telephone);
+    }
+    if (id) {
+      if (!email && !name && !telephone) {
+        whereString += " WHERE";
+      } else {
+        whereString += " AND";
+      }
+      whereString += ` id = $${values.length + 1}`;
+      values.push(id);
     }
     const result = await conn.query(sqlText + whereString, values);
     if (result.rowCount) {
