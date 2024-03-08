@@ -6,25 +6,6 @@ export class ClientController {
   constructor(clienteRepository: ClientRepository) {
     this.#_clienteRepository = clienteRepository;
   }
-  async getAll(): Promise<IResult> {
-    try {
-      const clients = await this.#_clienteRepository.findAll();
-      if (clients)
-        return {
-          statusCode: 200,
-          data: clients,
-        };
-      return {
-        statusCode: 404,
-        data: "Not Found",
-      };
-    } catch (error) {
-      return {
-        statusCode: 500,
-        data: error,
-      };
-    }
-  }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async get(params: Record<string, any>): Promise<IResult> {
     try {
@@ -63,5 +44,12 @@ export class ClientController {
         data: error,
       };
     }
+  }
+  async getRoutesOptimized(): Promise<IResult> {
+    await this.#_clienteRepository.getRoutesOptimized();
+    return {
+      statusCode: 200,
+      data: "",
+    };
   }
 }

@@ -1,17 +1,26 @@
 import IClientRepository from "./IClientRepository";
 import conn from "../connection";
 import Client from "../entities/Client";
-
+interface IPoint {
+  x: number;
+  y: number;
+}
 export default class ClientRepository implements IClientRepository {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async find(params: Record<string, any>): Promise<void | Client[]> {
+  async find(params: Record<string, any> | null): Promise<null | Client[]> {
     const values = [];
-    const id = params["id"];
-    const email = params["email"];
-    const name = params["name"];
-    const telephone = params["telephone"];
-
-    const sqlText = "SELECT id, name, email, telephone FROM clients ";
+    let id;
+    let email;
+    let name;
+    let telephone;
+    if (params) {
+      id = params["id"];
+      email = params["email"];
+      name = params["name"];
+      telephone = params["telephone"];
+    }
+    const sqlText =
+      "SELECT id, name, email, telephone, cordX, cordY FROM clients ";
     let whereString = "";
 
     if (email) {
@@ -48,29 +57,30 @@ export default class ClientRepository implements IClientRepository {
     const result = await conn.query(sqlText + whereString, values);
     if (result.rowCount) {
       const clientData = result.rows.map((data) => {
-        return Client.parse(data.id, data.name, data.email, data.telephone);
+        return Client.parse(
+          data.id,
+          data.name,
+          data.email,
+          data.telephone,
+          data.cordx,
+          data.cordy
+        );
       });
+      console.log(clientData);
       return clientData;
     }
-    return;
+    return null;
   }
-  async findAll(): Promise<void | Client[]> {
-    const sqlText = "SELECT id, name, email, telephone FROM clients";
-    const result = await conn.query(sqlText);
-    if (result.rowCount) {
-      const clientData = result.rows.map((data): Client => {
-        return Client.parse(data.id, data.name, data.email, data.telephone);
-      });
-      return clientData;
-    } else return;
-  }
+
   async create(entity: Client): Promise<void | Client> {
     const sqlText =
-      "INSERT INTO clients (name, email, telephone) VALUES ($1, $2, $3) RETURNING id";
+      "INSERT INTO clients (name, email, telephone, cordX, cordY) VALUES ($1, $2, $3, $4, $5) RETURNING id";
     const result = await conn.query(sqlText, [
       entity.name,
       entity.email,
       entity.telephone,
+      entity.cordX,
+      entity.cordY,
     ]);
     if (result.rowCount) {
       const row = result.rows[0];
@@ -79,5 +89,28 @@ export default class ClientRepository implements IClientRepository {
       return entity;
     }
     return;
+  }
+  async getRoutesOptimized() {
+    const clients: Client[] | null = await this.find(null);
+    if (clients) {
+      console.log(clients);
+      clients.sort((a, b) => {
+        const distanceA = this.calculeDistance(
+          { x: 0, y: 0 },
+          { x: a.cordX, y: a.cordY }
+        );
+        const distanceB = this.calculeDistance(
+          { x: 0, y: 0 },
+          { x: b.cordX, y: b.cordY }
+        );
+        return distanceA - distanceB;
+      });
+      return clients;
+    }
+  }
+  calculeDistance(pointOne: IPoint, pointTwo: IPoint) {
+    const X = pointTwo.x - pointOne.x;
+    const Y = pointTwo.y - pointOne.y;
+    return Math.sqrt(X * X + Y * Y);
   }
 }
