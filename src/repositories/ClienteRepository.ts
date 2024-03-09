@@ -66,7 +66,6 @@ export default class ClientRepository implements IClientRepository {
           data.cordy
         );
       });
-      console.log(clientData);
       return clientData;
     }
     return null;
@@ -85,7 +84,6 @@ export default class ClientRepository implements IClientRepository {
     if (result.rowCount) {
       const row = result.rows[0];
       entity.id = row.id;
-      console.log(entity);
       return entity;
     }
     return;
