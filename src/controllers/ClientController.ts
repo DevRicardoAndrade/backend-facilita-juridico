@@ -16,8 +16,8 @@ export class ClientController {
           data: clients,
         };
       return {
-        statusCode: 404,
-        data: "Not Found",
+        statusCode: 200,
+        data: [],
       };
     } catch (error) {
       return {
@@ -46,10 +46,10 @@ export class ClientController {
     }
   }
   async getRoutesOptimized(): Promise<IResult> {
-    await this.#_clienteRepository.getRoutesOptimized();
+    const data = await this.#_clienteRepository.getRoutesOptimized();
     return {
       statusCode: 200,
-      data: "",
+      data: data,
     };
   }
 }
